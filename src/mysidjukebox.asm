@@ -1394,6 +1394,8 @@ ppath: {
         ldy #1
         clc
         jsr PLOT
+        lda #39                 // place sur la 1re ligne (colonnes 1-39)
+        sta tmp
         ldx #0
         lda sbn
         cmp #79
@@ -1402,14 +1404,26 @@ ppath: {
         jsr CHROUT
         jsr CHROUT
         jsr CHROUT
+        lda #36
+        sta tmp
         lda sbn                 // on garde les 75 derniers
         sec
         sbc #75
         tax
 pr:     cpx sbn
         beq x
-        lda sbuf,x
+        lda tmp                 // 1re ligne pleine : suite en colonne 1 de la ligne suivante
+        bne !+
+        stx svx
+        ldx #PROW + 1
+        ldy #1
+        clc
+        jsr PLOT
+        ldx svx
+        dec tmp                 // tmp = $FF : plus de changement de ligne
+!:      lda sbuf,x
         jsr CHROUT
+        dec tmp
         inx
         bne pr
 x:      rts
