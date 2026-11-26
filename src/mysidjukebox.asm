@@ -47,7 +47,6 @@
         .const IROW = 8                 // Title / Artist / Released : lignes 8, 10, 12
         .const PROW = 14                // chemin : lignes 14-15
         .const TROW = 17                // sous-morceau, temps, norme
-        .const TCOL = 15
         .const BROW = 19                // barre de progression
         .const BARX = 1
         .const BARW = 38                // 38 caractères de 8 points
@@ -1048,12 +1047,16 @@ ptime: {
 !:      pha
         txa
         jsr dec2
-        sta SCR + TROW * 40 + TCOL
-        stx SCR + TROW * 40 + TCOL + 1
+        ldy tcol
+        sta SCR + TROW * 40,y
+        txa
+        sta SCR + TROW * 40 + 1,y
         pla
         jsr dec2
-        sta SCR + TROW * 40 + TCOL + 3
-        stx SCR + TROW * 40 + TCOL + 4
+        ldy tcol
+        sta SCR + TROW * 40 + 3,y
+        txa
+        sta SCR + TROW * 40 + 4,y
         rts
 }
 // A (0-99) -> A = dizaines, X = unités, en codes écran
@@ -1107,10 +1110,42 @@ show: {
         ldx #$56
         jsr hval
         jsr ppath
-        lda #13                 // sous-morceau, temps, norme
+        lda song                // ligne centrée « Tune x/y   mm:ss / mm:ss   PAL 50Hz » :
+        ldx #0                  // longueur = 6 + chiffres(x) + chiffres(y) + 3 + 13 + 3 + norme
+        jsr ndig
+        sty svy
+        lda nsongs
+        ldx #0
+        jsr ndig
+        tya
+        clc
+        adc svy
+        adc #6
+        sta tdt                 // tdt = longueur de « Tune x/y »
+        ldx #3 + 1 + 4          // norme : « PAL » 3 ou « NTSC » 4, espace, « 50Hz » 4 ou « TIMER » 5
+        lda tpal
+        bne !+
+        inx
+!:      lda cia
+        beq !+
+        inx
+!:      txa
+        clc
+        adc tdt
+        adc #3 + 13 + 3
+        eor #$FF                // début = (40 - longueur) / 2
+        sec
+        adc #40
+        lsr
+        sta tdt + 1
+        clc                     // colonne du temps
+        adc tdt
+        adc #3
+        sta tcol
+        lda #13
         sta $0286
         ldx #TROW
-        ldy #1
+        ldy tdt + 1
         clc
         jsr PLOT
         :print(t_song)
@@ -1123,7 +1158,7 @@ show: {
         ldx nsongs
         jsr prdec
         ldx #TROW
-        ldy #TCOL
+        ldy tcol
         clc
         jsr PLOT
         lda #1
@@ -1131,8 +1166,11 @@ show: {
         :print(t_temps)
         lda #13
         sta $0286
+        lda tcol
+        clc
+        adc #13 + 3
+        tay
         ldx #TROW
-        ldy #30
         clc
         jsr PLOT
         lda tpal
@@ -2866,6 +2904,7 @@ secs:   .word 0
 lastb:  .word 0
 loop:   .byte 0
 hmax:   .byte 0
+tcol:   .byte 0       // colonne du temps (ligne centrée)
 hh:     .byte 0
 sbn:    .byte 0
 sbuf:   .fill 168, 0
