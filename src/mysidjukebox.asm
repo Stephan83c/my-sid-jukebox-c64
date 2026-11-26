@@ -1259,7 +1259,7 @@ x:      rts
 
 // page de présentation au lancement : 20 s, ou jusqu'à une touche
 splash: {
-        .const R = 4            // logo : lignes 4-6
+        .const R = (25 - 19) / 2  // bloc de 19 lignes (logo à « Press any key ») centré verticalement : logo lignes 3-5
         .const SPLASHJ = 20 * 60
         lda #$93
         jsr CHROUT
