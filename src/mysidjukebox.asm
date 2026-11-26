@@ -38,7 +38,7 @@
         .const COLR = $D800
         .const CHR  = $E000             // caractères (RAM sous le KERNAL)
         .const D018V = $38              // écran $CC00, caractères $E000
-        .const BORD = 6                 // bordure bleue (palette : bleus du logo, accent jaune)
+        .const BORD = 0                 // bordure noire (palette : bleus du logo, accent jaune)
         .const BACK = 0
         .const LOGOX = (40 - BIG_W) / 2 // logo centré
         .const VERSION = "v1.0"         // affichée en haut à droite
