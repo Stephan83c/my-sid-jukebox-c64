@@ -20,3 +20,4 @@ et les joue au hasard. Pas de HVSC, pas d'outil PC, pas de réseau, pas de scrol
   `java -jar ~/KickAssembler/KickAss.jar src/mysidjukebox.asm -o build/mysidjukebox.prg` (essai court : `:DUREE=10`).
   Écran reconstitué par l'API : `python3 outils/ecran_png.py x.png`.
 - Dépôt git local (branche `main`, créé le 2026-11-26), pas de dépôt distant. `build/` et `*.sym` ne sont pas suivis.
+- Licence : **GPL-3.0-or-later** (fichier `LICENSE`, décision de l'utilisateur le 2026-11-26), auteur affiché : « Stephan ».

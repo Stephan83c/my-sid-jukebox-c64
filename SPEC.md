@@ -199,5 +199,5 @@ Le morceau écrit directement dans le SID, dont les registres ne se relisent pas
 ## 13. Page de présentation (2026-11-26)
 
 - Au lancement (bloc centré verticalement) : logo géant (lignes 3-5), sous-titre, « v1.0 - for C64 Ultimate », trois lignes de présentation, touches,
-  « Press any key ». Dure **20 s** (choix de l'utilisateur ; 1 200 jiffies du KERNAL, qui comptent en 1/60 s) ou jusqu'à une touche.
+  « by Stephan - licensed under GPL v3 », « Press any key ». Dure **20 s** (choix de l'utilisateur ; 1 200 jiffies du KERNAL, qui comptent en 1/60 s) ou jusqu'à une touche.
   Mesuré sur le C64U : lecture 22 s après le lancement sans touche (20 s + relecture de la liste), 4 s avec ESPACE à 3 s.

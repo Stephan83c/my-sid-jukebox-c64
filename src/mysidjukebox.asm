@@ -1,4 +1,6 @@
 // My SID Jukebox : jukebox SID hors ligne pour C64 Ultimate (programme définitif, issu de essais/joue.asm).
+// Copyright (C) 2026 Stephan
+// SPDX-License-Identifier: GPL-3.0-or-later (texte complet : LICENSE)
 // Écran : banque VIC 3, écran $CC00, caractères $E000 (police du C64 + logo géant).
 // (historique de l'essai :) Choix des lecteurs, liste dans /Temp (gardée, R pour la refaire),
 // tirage au hasard, chargement du .sid et lecture.
@@ -1289,6 +1291,10 @@ splash: {
         lda #<t_sver
         ldy #>t_sver
         ldx #R + 6
+        jsr center
+        lda #<t_sby
+        ldy #>t_sby
+        ldx #R + 7
         jsr center
         lda #15
         sta $0286
@@ -2999,6 +3005,8 @@ t_k2:      .byte 5
 t_ver:     .text VERSION
            .byte 0
 t_sver:    .text VERSION + " - for C64 Ultimate"
+           .byte 0
+t_sby:     .text "by Stephan - licensed under GPL v3"
            .byte 0
 t_s1:      .text "Finds every SID file on your SD card,"
            .byte 0
