@@ -1217,12 +1217,10 @@ frame: {
         :print(t_ver)
         lda #12
         sta $0286
-        ldx #LROW + 4           // sous-titre, aligné à gauche lui aussi
-        ldy #LOGOX
-        clc
-        jsr PLOT
-        :print(t_sub)
-        rts
+        lda #<t_sub             // sous-titre centré
+        ldy #>t_sub
+        ldx #LROW + 4
+        jmp center
 }
 
 // chaîne A/Y (sans codes de couleur) centrée sur la ligne X
