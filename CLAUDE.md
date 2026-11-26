@@ -19,5 +19,5 @@ et les joue au hasard. Pas de HVSC, pas d'outil PC, pas de réseau, pas de scrol
 - **Programme définitif** : `src/mysidjukebox.asm` (logo : `outils/mkbig.py` → `src/big.inc`). Assembler :
   `java -jar ~/KickAssembler/KickAss.jar src/mysidjukebox.asm -o build/mysidjukebox.prg` (essai court : `:DUREE=10`).
   Écran reconstitué par l'API : `python3 outils/ecran_png.py x.png`.
-- Dépôt git local (branche `main`, créé le 2026-11-26), pas de dépôt distant. `build/` et `*.sym` ne sont pas suivis.
+- Dépôt GitHub **public** `Stephan83c/my-sid-jukebox-c64` (branche `main`), release v1.0 le 2026-11-26 (`mysidjukebox.prg` + zip avec README et LICENSE). Commits avec l'adresse noreply de GitHub (jamais l'adresse Gmail). `build/` et `*.sym` ne sont pas suivis.
 - Licence : **GPL-3.0-or-later** (fichier `LICENSE`, décision de l'utilisateur le 2026-11-26), auteur affiché : « Stephan ».
