@@ -4,6 +4,8 @@ An offline SID jukebox for the **C64 Ultimate**. It finds every `.sid` file on y
 network drive, and plays them at random, right on the C64. No PC, no network server, no HVSC needed: it plays
 **your own** collection.
 
+![My SID Jukebox playing a tune](docs/screenshot.png)
+
 It is the offline companion of [SID Jukebox](https://github.com/Stephan83c/jukebox-sid-c64), which streams
 tunes from an online server.
 
