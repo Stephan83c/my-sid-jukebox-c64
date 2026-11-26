@@ -40,10 +40,10 @@
         .const D018V = $38              // écran $CC00, caractères $E000
         .const BORD = 0
         .const BACK = 0
-        .const LOGOX = (40 - BIG_W) / 2
+        .const LOGOX = 1                // logo aligné à gauche, comme les étiquettes
         .const VERSION = "v1.0"         // affichée en haut à droite
         .const VLEN = VERSION.size()
-        .const LROW = 2                 // logo : lignes 2-4
+        .const LROW = 1                 // logo : lignes 1-3
         .const IROW = 8                 // Title / Artist / Released : lignes 8, 10, 12
         .const ICOL = 11                // colonne des valeurs
         .const PROW = 14                // chemin : lignes 14-15
@@ -1217,10 +1217,12 @@ frame: {
         :print(t_ver)
         lda #12
         sta $0286
-        lda #<t_sub
-        ldy #>t_sub
-        ldx #LROW + 4
-        jmp center
+        ldx #LROW + 4           // sous-titre, aligné à gauche lui aussi
+        ldy #LOGOX
+        clc
+        jsr PLOT
+        :print(t_sub)
+        rts
 }
 
 // chaîne A/Y (sans codes de couleur) centrée sur la ligne X
