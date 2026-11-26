@@ -1599,7 +1599,7 @@ scan:   jsr frame
         lda #<t_titre
         ldy #>t_titre
         ldx #IROW
-        jsr atleft
+        jsr center
         lda #0
         sta nsid
         sta nsid + 1
@@ -1657,8 +1657,23 @@ rootf:  lda #LT
         sta tj + 1
         cli
         jsr counter
+        lda ndirs               // « Folders: n  time: n jiffies » centré : 9 + 8 + 8 + chiffres
+        ldx ndirs + 1
+        jsr ndig
+        sty svy
+        lda tj
+        ldx tj + 1
+        jsr ndig
+        tya
+        clc
+        adc svy
+        adc #9 + 8 + 8
+        eor #$FF
+        sec
+        adc #40
+        lsr
+        tay
         ldx #IROW + 4
-        ldy #1
         clc
         jsr PLOT
         lda #12
@@ -1683,7 +1698,10 @@ go:     lda nsid
         beq !+
         jmp pick
 !:      jsr clrst
-        :print(t_aucun)
+        lda #<t_aucun
+        ldy #>t_aucun
+        ldx #SROW
+        jsr center
 !:      jsr GETIN
         beq !-
         jmp exitb
@@ -2309,8 +2327,18 @@ counter: {
         jsr PLOT
         stx svx
         sty svy
+        lda nsid                // « n SIDs found » centré : longueur = chiffres + 11
+        ldx nsid + 1
+        jsr ndig
+        tya
+        clc
+        adc #11
+        eor #$FF
+        sec
+        adc #40
+        lsr
+        tay
         ldx #IROW + 2
-        ldy #1
         clc
         jsr PLOT
         lda #1
