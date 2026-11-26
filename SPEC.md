@@ -184,3 +184,14 @@ Le morceau écrit directement dans le SID, dont les registres ne se relisent pas
   étiquettes bleu clair (14) ; valeurs blanc (titre) et gris clair (15) ; chemin et numéro du tirage gris (12) ; ligne Tune / norme
   cyan (3), temps blanc ; barre cyan (écoulé) / bleu (reste) ; touches : lettres blanches, mots bleu clair, « Loop » jaune (7) si
   actif ; avertissement de norme jaune ; refus rouge clair (10).
+
+## 12. Lecteur FTP (lien réseau de l'Ultimate vers un NAS, 2026-11-26)
+
+- Le C64U de l'utilisateur a un lien réseau nommé **FTP** vers son NAS : le dossier `/FTP` (contenant `NAS`) **n'apparaît pas**
+  dans la liste de la racine (ni par la Command Interface, ni par le FTP de l'Ultimate : `SD Flash Temp USB1`), mais on peut y
+  entrer (`CHANGE_DIR`), le lister et y lire/écrire. `essais/dirtest.asm :ROOT=/FTP/NAS` : 6 dossiers en ~1,7 s.
+- **Ajout dynamique** : après la lecture de la racine, l'écran de choix essaie `CHANGE_DIR /FTP` ; s'il réussit, « FTP » est ajouté
+  aux lecteurs (coché comme les autres), sinon rien. Dossiers sautés en plus : noms commençant par `#` (`#recycle`, corbeille du
+  NAS) et `@` (`@eaDir`, Synology).
+- Test : 5 PSID copiés de la clé USB vers `/FTP/NAS/ftp/SID` (par le FTP de l'Ultimate, à la demande de l'utilisateur) ; recherche
+  FTP seul → 5 SID, joués depuis le NAS ; recherche SD + USB1 + FTP → **631** SID (626 + 5), 554 dossiers, 4 688 jiffies (~78 s).

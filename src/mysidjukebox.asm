@@ -1796,15 +1796,46 @@ choose: {
         jmp fatal
 !:      lda stat + 1
         cmp #$31
-        beq aff
+        beq probe
         :setpkt(drvstore)
         lda #$14
         sta cmd + 1
         lda #2
         sta cmdn
         jsr exec
-        bcs aff
+        bcs probe
         jmp fatal
+probe:  lda ndrv                // /FTP (lien réseau de l'Ultimate, ex. un NAS) : absent de la racine, essayé à part
+        cmp #NDRV
+        bcs aff
+        ldx #0
+!:      lda d_ftp,x
+        sta path,x
+        inx
+        cpx #4
+        bne !-
+        stx plen
+        jsr cd_path
+        bcc aff                 // pas de lien FTP : rien à ajouter
+        lda ndrv
+        asl
+        asl
+        asl
+        asl
+        tay
+        ldx #1
+!:      lda d_ftp,x             // nom du lecteur : « FTP »
+        sta drvtab,y
+        iny
+        inx
+        cpx #4
+        bne !-
+        lda #0
+        sta drvtab,y
+        ldx ndrv
+        lda #1
+        sta drvsel,x
+        inc ndrv
 aff:    jsr frame
         lda #14                 // titre centré
         sta $0286
@@ -2188,6 +2219,10 @@ skipdir: {
         cmp #$2E
         beq oui
         cmp #$24
+        beq oui
+        cmp #$23                // « #recycle » (corbeille d'un NAS)
+        beq oui
+        cmp #$40                // « @eaDir » (index des NAS Synology)
         beq oui
         ldx #0
 !:      lda (ptr),y
@@ -2801,6 +2836,7 @@ d_flash: .text "Flash"
         .byte 0
 d_tmp:  .text "Temp"
         .byte 0
+d_ftp:  .text "/FTP"
 d_root: .text "/"
         .encoding "petscii_mixed"
 t_choix:   .text "Drives to search:"
