@@ -40,10 +40,10 @@
         .const D018V = $38              // écran $CC00, caractères $E000
         .const BORD = 0
         .const BACK = 0
-        .const LOGOX = 1                // logo aligné à gauche, comme les étiquettes
+        .const LOGOX = (40 - BIG_W) / 2 // logo centré
         .const VERSION = "v1.0"         // affichée en haut à droite
         .const VLEN = VERSION.size()
-        .const LROW = 1                 // logo : lignes 1-3
+        .const LROW = 0                 // logo : lignes 0-2 (version à droite sur la ligne 0)
         .const IROW = 8                 // Title / Artist / Released : lignes 8, 10, 12
         .const ICOL = 11                // colonne des valeurs
         .const PROW = 14                // chemin : lignes 14-15
@@ -1108,10 +1108,10 @@ show: {
         ldx #$56
         jsr hval
         jsr ppath
-        lda #13                 // ligne 14 : sous-morceau, temps, norme
+        lda #13                 // sous-morceau, temps, norme
         sta $0286
         ldx #TROW
-        ldy #2
+        ldy #1
         clc
         jsr PLOT
         :print(t_song)
@@ -1157,7 +1157,7 @@ n60:    :print(t_60)
         lda #<t_corr
         ldy #>t_corr
         ldx #BROW + 1
-        jsr center
+        jsr atleft
 !:      jsr pkeys
         lda #0                  // barre vide (secs remis à 0 par playstart de toute façon)
         sta secs
@@ -1221,6 +1221,20 @@ frame: {
         ldy #>t_sub
         ldx #LROW + 4
         jmp center
+}
+
+// chaîne A/Y en colonne 1 de la ligne X
+atleft: {
+        pha
+        tya
+        pha
+        ldy #1
+        clc
+        jsr PLOT
+        pla
+        tay
+        pla
+        jmp prs
 }
 
 // chaîne A/Y (sans codes de couleur) centrée sur la ligne X
@@ -1488,7 +1502,7 @@ scan:   jsr frame
         lda #<t_titre
         ldy #>t_titre
         ldx #IROW
-        jsr center
+        jsr atleft
         lda #0
         sta nsid
         sta nsid + 1
@@ -1547,7 +1561,7 @@ rootf:  lda #LT
         cli
         jsr counter
         ldx #IROW + 4
-        ldy #8
+        ldy #1
         clc
         jsr PLOT
         lda #12
@@ -1692,7 +1706,6 @@ aff:    jsr frame
 !:      ldx #0
 ligne:  stx idrv
         lda #' '
-        jsr CHROUT
         jsr CHROUT
         txa
         clc
@@ -2145,7 +2158,7 @@ counter: {
         stx svx
         sty svy
         ldx #IROW + 2
-        ldy #13
+        ldy #1
         clc
         jsr PLOT
         lda #1
@@ -2610,14 +2623,14 @@ d_tmp:  .text "Temp"
         .byte 0
 d_root: .text "/"
         .encoding "petscii_mixed"
-t_choix:   .text "  Drives to search:"
+t_choix:   .text " Drives to search:"
            .byte 13,13,0
 t_choixt:  .byte 13
-           .text "  1-9 tick/untick   RETURN search"
+           .text " 1-9 tick/untick   RETURN search"
            .byte 13
-           .text "  Q cancel"
+           .text " Q cancel"
            .byte 13,0
-t_nodrv:   .text "  No drive found (SD, USB)"
+t_nodrv:   .text " No drive found (SD, USB)"
            .byte 13,0
 t_abort:   .text "UCI busy, cannot abort"
            .byte 13,0

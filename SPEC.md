@@ -165,7 +165,7 @@ Le morceau écrit directement dans le SID, dont les registres ne se relisent pas
 - Banque VIC 3 : écran `$CC00`, police `$E000` (RAM sous le KERNAL) = police du C64 minuscules + logo (codes 128+) + 8 barres.
   `$0288 = $CC` (le KERNAL écrit dans le bon écran), `$0291 = $80` (pas de changement de jeu par SHIFT + C=). Retour au BASIC
   (Q) : banque 0, `$D018 = $17`, `$0288 = $04`.
-- Écran de lecture : logo (1-3, aligné à gauche depuis le 2026-11-26), sous-titre centré (5), titre / auteur / date (8, 10, 12), chemin (11-12, début coupé « ... »),
+- Écran de lecture : logo centré (lignes 0-2), sous-titre centré (4), tout le reste aligné en colonne 1, titre / auteur / date (8, 10, 12), chemin (11-12, début coupé « ... »),
   sous-morceau + temps + norme (14), avertissement de norme (15), effet (16-20), ligne d'état des refus (22), touches (23),
   numéro du tirage (24). Écrans de choix des lecteurs et de recherche avec le même logo.
 - Effet : l'oscilloscope de `$D41B` ne montrait que des blocs (voix 3 souvent en onde carrée) : remplacé par l'**enveloppe de la
