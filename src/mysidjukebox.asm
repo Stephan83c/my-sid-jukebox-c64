@@ -1167,25 +1167,60 @@ n60:    :print(t_60)
         dex
         bpl !-
         jsr pbar
-        lda #11                 // ligne 24 : numéro du tirage
+        lda #11                 // ligne 24 : « SID n of m » centré
         sta $0286
+        lda k                   // n = k + 1
+        clc
+        adc #1
+        sta tmp
+        lda k + 1
+        adc #0
+        sta tmp + 1
+        tax
+        lda tmp
+        jsr ndig                // longueur = 8 + chiffres(n) + chiffres(m)
+        sty svy
+        lda nsid
+        ldx nsid + 1
+        jsr ndig
+        tya
+        clc
+        adc svy
+        adc #8
+        eor #$FF                // colonne = (40 - longueur) / 2
+        sec
+        adc #40
+        lsr
+        tay
         ldx #24
-        ldy #1
         clc
         jsr PLOT
         :print(t_tir)
-        lda k + 1
-        ldx k
-        inx
-        bne !+
-        clc
-        adc #1
-!:      jsr prdec
+        lda tmp + 1
+        ldx tmp
+        jsr prdec
         :print(t_sur)
         lda nsid + 1
         ldx nsid
         jsr prdec
         rts
+}
+
+// Y = nombre de chiffres de X:A (octet haut : octet bas), 1 à 5
+ndig: {
+        sta tdt
+        stx tdt + 1
+        ldy #1
+        ldx #3                  // p10 : 10000, 1000, 100, 10 (index 0 à 3)
+!:      lda tdt                 // valeur >= 10, 100, 1000, 10000 ?
+        cmp prdec.p10l,x
+        lda tdt + 1
+        sbc prdec.p10h,x
+        bcc x
+        iny
+        dex
+        bpl !-
+x:      rts
 }
 
 // fond commun : écran effacé, logo géant (lignes 1-3), sous-titre (ligne 5)
