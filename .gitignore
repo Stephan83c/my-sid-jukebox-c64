@@ -1,0 +1,4 @@
+# fichiers produits par Kick Assembler
+build/
+*.sym
+*.prg
