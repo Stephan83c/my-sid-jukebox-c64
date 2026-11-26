@@ -180,3 +180,7 @@ Le morceau écrit directement dans le SID, dont les registres ne se relisent pas
 - **Barre de progression** (2026-11-26) : ligne 19, 38 caractères de 8 points (glyphes `bar_chars` en code 128 + BIG_N :
   partie écoulée épaisse, reste en trait fin), mise à jour chaque seconde ; Title / Artist / Released une ligne sur deux (8, 10, 12).
   Durée totale affichée calculée depuis `DUREE`.
+- **Couleurs** (2026-11-26) : palette des bleus du logo, un seul accent jaune. Fond noir, bordure bleue (6) ; sous-titre et
+  étiquettes bleu clair (14) ; valeurs blanc (titre) et gris clair (15) ; chemin et numéro du tirage gris (12) ; ligne Tune / norme
+  cyan (3), temps blanc ; barre cyan (écoulé) / bleu (reste) ; touches : lettres blanches, mots bleu clair, « Loop » jaune (7) si
+  actif ; avertissement de norme jaune ; refus rouge clair (10).

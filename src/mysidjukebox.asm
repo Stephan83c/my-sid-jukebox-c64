@@ -38,7 +38,7 @@
         .const COLR = $D800
         .const CHR  = $E000             // caractères (RAM sous le KERNAL)
         .const D018V = $38              // écran $CC00, caractères $E000
-        .const BORD = 0
+        .const BORD = 6                 // bordure bleue (palette : bleus du logo, accent jaune)
         .const BACK = 0
         .const LOGOX = (40 - BIG_W) / 2 // logo centré
         .const VERSION = "v1.0"         // affichée en haut à droite
@@ -1142,7 +1142,7 @@ show: {
         adc tdt
         adc #3
         sta tcol
-        lda #13
+        lda #3 
         sta $0286
         ldx #TROW
         ldy tdt + 1
@@ -1164,7 +1164,7 @@ show: {
         lda #1
         sta $0286
         :print(t_temps)
-        lda #13
+        lda #3 
         sta $0286
         lda tcol
         clc
@@ -1189,7 +1189,7 @@ n60:    :print(t_60)
 !:      lda tpal
         cmp pal
         beq !+
-        lda #12
+        lda #7 
         sta $0286
         lda #<t_corr
         ldy #>t_corr
@@ -1199,13 +1199,8 @@ n60:    :print(t_60)
         lda #0                  // barre vide (secs remis à 0 par playstart de toute façon)
         sta secs
         sta secs + 1
-        ldx #BARW - 1
-        lda #14
-!:      sta COLR + BROW * 40 + BARX,x
-        dex
-        bpl !-
         jsr pbar
-        lda #11                 // ligne 24 : « SID n of m » centré
+        lda #12                 // ligne 24 : « SID n of m » centré
         sta $0286
         lda k                   // n = k + 1
         clc
@@ -1287,7 +1282,7 @@ frame: {
         clc
         jsr PLOT
         :print(t_ver)
-        lda #12
+        lda #14
         sta $0286
         lda #<t_sub             // sous-titre centré
         ldy #>t_sub
@@ -1366,14 +1361,20 @@ pl:     lda #<(BARW * 8)
         ldx #0
 bl:     cpx tmp + 1
         bcs !+
+        lda #3                  // écoulé : cyan
+        sta COLR + BROW * 40 + BARX,x
         lda #BAR0 + 8
         bne w
 !:      bne !+
+        lda #3
+        sta COLR + BROW * 40 + BARX,x
         lda tmp
         clc
         adc #BAR0
         bne w
-!:      lda #BAR0
+!:      lda #6                  // reste : bleu
+        sta COLR + BROW * 40 + BARX,x
+        lda #BAR0
 w:      sta SCR + BROW * 40 + BARX,x
         inx
         cpx #BARW
@@ -1389,7 +1390,7 @@ label: {
         ldy #1
         clc
         jsr PLOT
-        lda #12
+        lda #14
         sta $0286
         lda sp
         ldy sp + 1
@@ -1426,10 +1427,10 @@ pkeys: {
         clc
         jsr PLOT
         :print(t_k1)
-        lda #$9B
+        lda #$9A                // bleu clair, jaune si la boucle est active
         ldx loop
         beq !+
-        lda #$99
+        lda #$9E
 !:      jsr CHROUT
         :print(t_loop)
         ldx #KROW + 1
@@ -1465,7 +1466,7 @@ ppath: {
         cpy #160
         bne !-
 !:      sty sbn
-        lda #11
+        lda #12
         sta $0286
         ldx #PROW
         ldy #1
@@ -1593,7 +1594,7 @@ x:      lda #13
 
 // ------------------------------------------------------------ recherche (liste refaite)
 scan:   jsr frame
-        lda #15
+        lda #14
         sta $0286
         lda #<t_titre
         ldy #>t_titre
@@ -1791,9 +1792,11 @@ aff:    jsr frame
         ldy #0
         clc
         jsr PLOT
-        lda #15
+        lda #14
         sta $0286
         :print(t_choix)
+        lda #1
+        sta $0286
         lda ndrv
         bne !+
         :print(t_nodrv)
@@ -1839,6 +1842,8 @@ ligne:  stx idrv
         inx
         cpx ndrv
         bne ligne
+        lda #12
+        sta $0286
         :print(t_choixt)
 key:    jsr GETIN
         beq key
@@ -2770,11 +2775,11 @@ t_temps:   .text "00:00 / " + (dmm < 10 ? "0" : "") + toIntString(dmm) + ":" + (
            .byte 0
 t_k1:      .byte 5                     // touches (pkeys)
            .text "SPACE"
-           .byte $9B
+           .byte $9A
            .text " Next  "
            .byte 5
            .text "+/-"
-           .byte $9B
+           .byte $9A
            .text " Tune  "
            .byte 5
            .text "L"
@@ -2783,11 +2788,11 @@ t_loop:    .text " Loop"
            .byte 0
 t_k2:      .byte 5
            .text "R"
-           .byte $9B
+           .byte $9A
            .text " Scan  "
            .byte 5
            .text "Q"
-           .byte $9B
+           .byte $9A
            .text " Quit"
            .byte 0
 t_ver:     .text VERSION

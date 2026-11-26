@@ -17,8 +17,11 @@ for g in range(9):            # barre de progression (même formule que bar_char
         font[(128 + n + g) * 8 + r] = (((0xFF00 >> g) & 0xFF) if 1 <= r <= 6 else 0) | (0xFF if r in (3, 4) else 0)
 pal = [(0,0,0),(255,255,255),(136,57,50),(103,182,189),(139,63,150),(85,160,73),(64,49,141),(191,206,114),
        (139,84,41),(87,66,0),(184,105,98),(80,80,80),(120,120,120),(148,224,137),(120,105,196),(159,159,159)]
-im = Image.new('RGB', (384, 272), (0, 0, 0))
+vic = mem(0xD020, 2)
+im = Image.new('RGB', (384, 272), pal[vic[0] & 15])
 px = im.load()
+for y in range(200):
+    for x in range(320): px[32 + x, 36 + y] = pal[vic[1] & 15]
 for i in range(1000):
     cx, cy, c = i % 40, i // 40, scr[i]
     fg = pal[col[i] & 15]
