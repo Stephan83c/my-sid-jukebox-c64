@@ -1788,18 +1788,24 @@ choose: {
         bcs aff
         jmp fatal
 aff:    jsr frame
+        lda #14                 // titre centré
+        sta $0286
+        lda #<t_choix
+        ldy #>t_choix
         ldx #IROW - 1
+        jsr center
+        lda #1
+        sta $0286
+        ldx #IROW + 1           // les lignes des lecteurs partent d'ici
         ldy #0
         clc
         jsr PLOT
-        lda #14
-        sta $0286
-        :print(t_choix)
-        lda #1
-        sta $0286
         lda ndrv
         bne !+
-        :print(t_nodrv)
+        lda #<t_nodrv
+        ldy #>t_nodrv
+        ldx #IROW + 1
+        jsr center
         clc
         rts
 !:      lda #0                  // bloc centré : largeur = « 1 [x] » + nom le plus long
@@ -1876,9 +1882,20 @@ ligne:  stx idrv
         inx
         cpx ndrv
         bne ligne
-        lda #12
+        lda #12                 // aide centrée, une ligne sous la liste
         sta $0286
-        :print(t_choixt)
+        sec
+        jsr PLOT
+        inx
+        stx svx
+        lda #<t_choixt
+        ldy #>t_choixt
+        jsr center
+        ldx svx
+        inx
+        lda #<t_choixq
+        ldy #>t_choixq
+        jsr center
 key:    jsr GETIN
         beq key
         cmp #'q'
@@ -2758,15 +2775,14 @@ d_tmp:  .text "Temp"
         .byte 0
 d_root: .text "/"
         .encoding "petscii_mixed"
-t_choix:   .text " Drives to search:"
-           .byte 13,13,0
-t_choixt:  .byte 13
-           .text " 1-9 tick/untick   RETURN search"
-           .byte 13
-           .text " Q cancel"
-           .byte 13,0
-t_nodrv:   .text " No drive found (SD, USB)"
-           .byte 13,0
+t_choix:   .text "Drives to search:"
+           .byte 0
+t_choixt:  .text "1-9 tick/untick   RETURN search"
+           .byte 0
+t_choixq:  .text "Q cancel"
+           .byte 0
+t_nodrv:   .text "No drive found (SD, USB)"
+           .byte 0
 t_abort:   .text "UCI busy, cannot abort"
            .byte 13,0
 t_nouci:   .text "No Command Interface (enable it in the Ultimate menu)"
