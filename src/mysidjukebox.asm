@@ -53,8 +53,8 @@
         .const BARW = 38                // 38 caractères de 8 points
         .const BARK = round(BARW * 8 * 256 / DUREE)  // points = secs x BARK / 256
         .const BAR0 = 128 + BIG_N       // 9 glyphes : 0 à 8 points pleins à gauche, trait fin à droite
-        .const SROW = 21                // ligne d'état (refus)
-        .const KROW = 23                // touches
+        .const SROW = 20                // ligne d'état (refus ; même ligne que l'avertissement de norme)
+        .const KROW = 21                // touches : lignes 21-22, centrées
         .const MAXREF = 40              // refus d'affilée avant d'abandonner
         .const FORCEK = cmdLineVars.containsKey("FORCEK") ? cmdLineVars.get("FORCEK").asNumber() : -1  // essai : 1er tirage imposé
 
@@ -1346,10 +1346,10 @@ hval: {
 x:      rts
 }
 
-// ligne des touches, 40 colonnes : « Loop » en vert clair quand la boucle est active
+// touches sur deux lignes centrées : « Loop » en vert clair quand la boucle est active
 pkeys: {
         ldx #KROW
-        ldy #0
+        ldy #(40 - 28) / 2      // « SPACE Next  +/- Tune  L Loop » = 28 colonnes
         clc
         jsr PLOT
         :print(t_k1)
@@ -1359,6 +1359,10 @@ pkeys: {
         lda #$99
 !:      jsr CHROUT
         :print(t_loop)
+        ldx #KROW + 1
+        ldy #(40 - 14) / 2      // « R Scan  Q Quit » = 14 colonnes
+        clc
+        jsr PLOT
         :print(t_k2)
         rts
 }
@@ -2691,23 +2695,23 @@ t_corr:    .text "Other video standard: tempo adjusted"
            .var dss = mod(DUREE, 60)
 t_temps:   .text "00:00 / " + (dmm < 10 ? "0" : "") + toIntString(dmm) + ":" + (dss < 10 ? "0" : "") + toIntString(dss)
            .byte 0
-t_k1:      .byte 5                     // touches (pkeys) : 40 colonnes en tout
+t_k1:      .byte 5                     // touches (pkeys)
            .text "SPACE"
            .byte $9B
-           .text " Next "
+           .text " Next  "
            .byte 5
            .text "+/-"
            .byte $9B
-           .text " Tune "
+           .text " Tune  "
            .byte 5
            .text "L"
            .byte 0
-t_loop:    .text " Loop "
+t_loop:    .text " Loop"
            .byte 0
 t_k2:      .byte 5
            .text "R"
            .byte $9B
-           .text " Scan "
+           .text " Scan  "
            .byte 5
            .text "Q"
            .byte $9B
