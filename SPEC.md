@@ -195,3 +195,9 @@ Le morceau écrit directement dans le SID, dont les registres ne se relisent pas
   NAS) et `@` (`@eaDir`, Synology).
 - Test : 5 PSID copiés de la clé USB vers `/FTP/NAS/ftp/SID` (par le FTP de l'Ultimate, à la demande de l'utilisateur) ; recherche
   FTP seul → 5 SID, joués depuis le NAS ; recherche SD + USB1 + FTP → **631** SID (626 + 5), 554 dossiers, 4 688 jiffies (~78 s).
+
+## 13. Page de présentation (2026-11-26)
+
+- Au lancement : logo géant (lignes 4-6), sous-titre, « v1.0 - for C64 Ultimate », trois lignes de présentation, touches,
+  « Press any key ». Dure **20 s** (choix de l'utilisateur ; 1 200 jiffies du KERNAL, qui comptent en 1/60 s) ou jusqu'à une touche.
+  Mesuré sur le C64U : lecture 22 s après le lancement sans touche (20 s + relecture de la liste), 4 s avec ESPACE à 3 s.

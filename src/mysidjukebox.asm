@@ -176,6 +176,7 @@ srcA:
 start:  tsx
         stx savesp
         jsr vinit
+        jsr splash
         lda #$93
         jsr CHROUT
         lda UCI_CMD
@@ -1253,6 +1254,92 @@ ndig: {
         iny
         dex
         bpl !-
+x:      rts
+}
+
+// page de présentation au lancement : 20 s, ou jusqu'à une touche
+splash: {
+        .const R = 4            // logo : lignes 4-6
+        .const SPLASHJ = 20 * 60
+        lda #$93
+        jsr CHROUT
+        ldx #BIG_W - 1
+!:      lda big_map,x
+        sta SCR + R * 40 + LOGOX,x
+        lda big_map + BIG_W,x
+        sta SCR + (R + 1) * 40 + LOGOX,x
+        lda big_map + 2 * BIG_W,x
+        sta SCR + (R + 2) * 40 + LOGOX,x
+        lda #1
+        sta COLR + R * 40 + LOGOX,x
+        lda #3
+        sta COLR + (R + 1) * 40 + LOGOX,x
+        lda #14
+        sta COLR + (R + 2) * 40 + LOGOX,x
+        dex
+        bpl !-
+        lda #14
+        sta $0286
+        lda #<t_sub
+        ldy #>t_sub
+        ldx #R + 4
+        jsr center
+        lda #12
+        sta $0286
+        lda #<t_sver
+        ldy #>t_sver
+        ldx #R + 6
+        jsr center
+        lda #15
+        sta $0286
+        lda #<t_s1
+        ldy #>t_s1
+        ldx #R + 9
+        jsr center
+        lda #<t_s2
+        ldy #>t_s2
+        ldx #R + 10
+        jsr center
+        lda #<t_s3
+        ldy #>t_s3
+        ldx #R + 11
+        jsr center
+        lda #3
+        sta $0286
+        lda #<t_s4
+        ldy #>t_s4
+        ldx #R + 14
+        jsr center
+        lda #<t_s5
+        ldy #>t_s5
+        ldx #R + 15
+        jsr center
+        lda #11
+        sta $0286
+        lda #<t_s6
+        ldy #>t_s6
+        ldx #R + 18
+        jsr center
+        lda #0                  // tampon clavier vidé
+        sta $C6
+        lda #<SPLASHJ           // 20 s (jiffies du KERNAL : 1/60 s) ou une touche
+        sta tmp
+        lda #>SPLASHJ
+        sta tmp + 1
+w:      lda $A2
+        sta svx
+!:      jsr GETIN
+        bne x
+        lda svx
+        cmp $A2
+        beq !-
+        lda tmp
+        bne !+
+        dec tmp + 1
+!:      dec tmp
+        lda tmp
+        ora tmp + 1
+        bne w
 x:      rts
 }
 
@@ -2910,6 +2997,20 @@ t_k2:      .byte 5
            .text " Quit"
            .byte 0
 t_ver:     .text VERSION
+           .byte 0
+t_sver:    .text VERSION + " - for C64 Ultimate"
+           .byte 0
+t_s1:      .text "Finds every SID file on your SD card,"
+           .byte 0
+t_s2:      .text "USB sticks and network drive (FTP),"
+           .byte 0
+t_s3:      .text "and plays them at random."
+           .byte 0
+t_s4:      .text "SPACE next tune   L loop   R new search"
+           .byte 0
+t_s5:      .text "+/- subtune   Q quit"
+           .byte 0
+t_s6:      .text "Press any key"
            .byte 0
 t_ti:      .text "Title:"
            .byte 0
