@@ -1802,11 +1802,44 @@ aff:    jsr frame
         :print(t_nodrv)
         clc
         rts
-!:      ldx #0
+!:      lda #0                  // bloc centré : largeur = « 1 [x] » + nom le plus long
+        sta tmp
+        sta idrv
+ml:     lda idrv
+        asl
+        asl
+        asl
+        asl
+        tax
+        ldy #0
+!:      lda drvtab,x
+        beq !+
+        inx
+        iny
+        bne !-
+!:      cpy tmp
+        bcc !+
+        sty tmp
+!:      inc idrv
+        lda idrv
+        cmp ndrv
+        bne ml
+        lda tmp
+        clc
+        adc #6
+        eor #$FF
+        sec
+        adc #40
+        lsr
+        sta tmp + 1             // colonne de départ des lignes
+        ldx #0
 ligne:  stx idrv
-        lda #' '
-        jsr CHROUT
-        txa
+        sec                     // ligne du curseur, colonne du bloc
+        jsr PLOT
+        ldy tmp + 1
+        clc
+        jsr PLOT
+        lda idrv
         clc
         adc #'1'
         jsr CHROUT
@@ -1814,6 +1847,7 @@ ligne:  stx idrv
         jsr CHROUT
         lda #'['
         jsr CHROUT
+        ldx idrv                // (X changé par PLOT)
         lda drvsel,x
         beq !+
         lda #'x'
