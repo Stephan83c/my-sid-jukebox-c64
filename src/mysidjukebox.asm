@@ -45,7 +45,6 @@
         .const VLEN = VERSION.size()
         .const LROW = 0                 // logo : lignes 0-2 (version à droite sur la ligne 0)
         .const IROW = 8                 // Title / Artist / Released : lignes 8, 10, 12
-        .const ICOL = 11                // colonne des valeurs
         .const PROW = 14                // chemin : lignes 14-15
         .const TROW = 17                // sous-morceau, temps, norme
         .const TCOL = 15
@@ -1309,7 +1308,7 @@ w:      sta SCR + BROW * 40 + BARX,x
         rts
 }
 
-// étiquette A/Y (gris) en colonne 1 de la ligne X, curseur ensuite en colonne ICOL
+// étiquette A/Y (gris) en colonne 1 de la ligne X, puis une espace ; hmax = place restante jusqu'au bord
 label: {
         sta sp
         sty sp + 1
@@ -1322,15 +1321,21 @@ label: {
         lda sp
         ldy sp + 1
         jsr prs
-        ldx svy
-        ldy #ICOL
-        clc
-        jmp PLOT
+        lda #' '
+        jsr CHROUT
+        sec                     // colonne du curseur
+        jsr PLOT
+        tya
+        eor #$FF
+        sec
+        adc #40
+        sta hmax
+        rts
 }
 
-// chaîne de l'en-tête en X : jusqu'au bord droit (40 - ICOL caractères au plus)
+// chaîne de l'en-tête en X : jusqu'au bord droit (hmax caractères au plus)
 hval: {
-        ldy #40 - ICOL
+        ldy hmax
 !:      lda hdr,x
         beq x
         jsr a2p
@@ -2807,6 +2812,7 @@ frames: .word 0
 secs:   .word 0
 lastb:  .word 0
 loop:   .byte 0
+hmax:   .byte 0
 hh:     .byte 0
 sbn:    .byte 0
 sbuf:   .fill 168, 0
