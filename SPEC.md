@@ -177,3 +177,6 @@ Le morceau écrit directement dans le SID, dont les registres ne se relisent pas
   (valeurs en colonne 11, coupées au bord) ; touche **L = Loop** comme le jukebox en ligne (le morceau recommence à la fin de
   sa durée, même sous-morceau ; « Loop » en vert quand actif ; reste actif au morceau suivant). Ligne des touches (40 col.) :
   `SPACE Next +/- Tune L Loop R Scan Q Quit`. Durée réglable pour les essais : `:DUREE=10`. Bouclage vérifié sur le C64U.
+- **Barre de progression** (2026-11-26) : ligne 19, 38 caractères de 8 points (glyphes `bar_chars` en code 128 + BIG_N :
+  partie écoulée épaisse, reste en trait fin), mise à jour chaque seconde ; Title / Artist / Released une ligne sur deux (8, 10, 12).
+  Durée totale affichée calculée depuis `DUREE`.

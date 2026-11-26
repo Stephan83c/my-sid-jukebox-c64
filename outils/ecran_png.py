@@ -1,5 +1,5 @@
 # Reconstitue l'écran de My SID Jukebox (écran $CC00, couleurs $D800) en PNG, avec la police du programme
-# (police du C64 minuscules + logo + barres, refaits ici depuis big.inc) : python3 ecran_png.py sortie.png
+# (police du C64 minuscules + logo + barre de progression, refaits ici depuis big.inc) : python3 ecran_png.py sortie.png
 import sys, re, urllib.request
 from pathlib import Path
 from PIL import Image
@@ -12,8 +12,9 @@ src = Path(__file__).resolve().parent.parent / 'src'
 big = [int(v, 16) for v in re.findall(r'\$([0-9A-F]{2})', (src / 'big.inc').read_text().split('big_map:')[0])]
 n = len(big) // 8
 font[128 * 8:128 * 8 + len(big)] = bytes(big)
-for g in range(1, 9):
-    for r in range(8): font[(128 + n + g - 1) * 8 + r] = 0x7E if r >= 8 - g else 0
+for g in range(9):            # barre de progression (même formule que bar_chars)
+    for r in range(8):
+        font[(128 + n + g) * 8 + r] = (((0xFF00 >> g) & 0xFF) if 1 <= r <= 6 else 0) | (0xFF if r in (3, 4) else 0)
 pal = [(0,0,0),(255,255,255),(136,57,50),(103,182,189),(139,63,150),(85,160,73),(64,49,141),(191,206,114),
        (139,84,41),(87,66,0),(184,105,98),(80,80,80),(120,120,120),(148,224,137),(120,105,196),(159,159,159)]
 im = Image.new('RGB', (384, 272), (0, 0, 0))

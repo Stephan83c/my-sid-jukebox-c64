@@ -44,13 +44,18 @@
         .const VERSION = "v1.0"         // affichée en haut à droite
         .const VLEN = VERSION.size()
         .const LROW = 2                 // logo : lignes 2-4
-        .const IROW = 9                 // Title / Artist / Released : lignes 9-11
+        .const IROW = 8                 // Title / Artist / Released : lignes 8, 10, 12
         .const ICOL = 11                // colonne des valeurs
-        .const PROW = 13                // chemin : lignes 13-14
-        .const TROW = 16                // sous-morceau, temps, norme
+        .const PROW = 14                // chemin : lignes 14-15
+        .const TROW = 17                // sous-morceau, temps, norme
         .const TCOL = 15
-        .const SROW = 20                // ligne d'état (refus)
-        .const KROW = 22                // touches
+        .const BROW = 19                // barre de progression
+        .const BARX = 1
+        .const BARW = 38                // 38 caractères de 8 points
+        .const BARK = round(BARW * 8 * 256 / DUREE)  // points = secs x BARK / 256
+        .const BAR0 = 128 + BIG_N       // 9 glyphes : 0 à 8 points pleins à gauche, trait fin à droite
+        .const SROW = 21                // ligne d'état (refus)
+        .const KROW = 23                // touches
         .const MAXREF = 40              // refus d'affilée avant d'abandonner
         .const FORCEK = cmdLineVars.containsKey("FORCEK") ? cmdLineVars.get("FORCEK").asNumber() : -1  // essai : 1er tirage imposé
 
@@ -897,6 +902,7 @@ tps:    jsr clocksec
         jmp ploop
 !:
         jsr ptime
+        jsr pbar
         lda secs + 1
         bne fini
         lda secs
@@ -1087,7 +1093,7 @@ show: {
         jsr hval
         lda #<t_ar
         ldy #>t_ar
-        ldx #IROW + 1
+        ldx #IROW + 2
         jsr label
         lda #15
         sta $0286
@@ -1095,7 +1101,7 @@ show: {
         jsr hval
         lda #<t_re
         ldy #>t_re
-        ldx #IROW + 2
+        ldx #IROW + 4
         jsr label
         lda #15
         sta $0286
@@ -1150,9 +1156,18 @@ n60:    :print(t_60)
         sta $0286
         lda #<t_corr
         ldy #>t_corr
-        ldx #TROW + 1
+        ldx #BROW + 1
         jsr center
 !:      jsr pkeys
+        lda #0                  // barre vide (secs remis à 0 par playstart de toute façon)
+        sta secs
+        sta secs + 1
+        ldx #BARW - 1
+        lda #14
+!:      sta COLR + BROW * 40 + BARX,x
+        dex
+        bpl !-
+        jsr pbar
         lda #11                 // ligne 24 : numéro du tirage
         sta $0286
         ldx #24
@@ -1228,6 +1243,56 @@ center: {
         lda sp
         ldy sp + 1
         jmp prs
+}
+
+// barre de progression : secs x BARK / 256 points sur BARW caractères
+pbar: {
+        lda secs
+        sta m1
+        lda secs + 1
+        sta m1 + 1
+        lda #<BARK
+        sta m2
+        lda #>BARK
+        sta m2 + 1
+        jsr mul16
+        lda prod + 1            // points = prod >> 8, bornés à BARW x 8
+        ldx prod + 2
+        cpx #>(BARW * 8)
+        bcc !+
+        bne pl
+        cmp #<(BARW * 8)
+        bcc !+
+pl:     lda #<(BARW * 8)
+        ldx #>(BARW * 8)
+!:      sta tmp                 // tmp = points (octet bas) ; A = points / 8 = caractères pleins
+        stx tmp + 1
+        lsr tmp + 1
+        ror
+        lsr tmp + 1
+        ror
+        lsr tmp + 1
+        ror
+        sta tmp + 1
+        lda tmp
+        and #7
+        sta tmp                 // reste (0-7)
+        ldx #0
+bl:     cpx tmp + 1
+        bcs !+
+        lda #BAR0 + 8
+        bne w
+!:      bne !+
+        lda tmp
+        clc
+        adc #BAR0
+        bne w
+!:      lda #BAR0
+w:      sta SCR + BROW * 40 + BARX,x
+        inx
+        cpx #BARW
+        bne bl
+        rts
 }
 
 // étiquette A/Y (gris) en colonne 1 de la ligne X, curseur ensuite en colonne ICOL
@@ -1367,6 +1432,11 @@ vinit: {
         inx
         cpx #BIG_N * 4
         bne !-
+        ldx #9 * 8 - 1
+!:      lda bar_chars,x
+        sta CHR + BAR0 * 8,x
+        dex
+        bpl !-
         lda $DD02
         ora #$03
         sta $DD02
@@ -1386,6 +1456,9 @@ vinit: {
         cli
         rts
 }
+// barre : glyphe n = n points pleins à gauche (lignes 1-6), trait fin (lignes 3-4) sur toute la largeur
+bar_chars:
+        .for (var n = 0; n <= 8; n++) .for (var r = 0; r < 8; r++) .byte ((r >= 1 && r <= 6) ? ($FF00 >> n) & $FF : 0) | ((r == 3 || r == 4) ? $FF : 0)
         #import "big.inc"
 
 pnorm:  beq !+
@@ -2582,7 +2655,9 @@ t_cia:     .text "TIMER"
            .byte 0
 t_corr:    .text "Other video standard: tempo adjusted"
            .byte 0
-t_temps:   .text "00:00 / 03:00"
+           .var dmm = floor(DUREE / 60)
+           .var dss = mod(DUREE, 60)
+t_temps:   .text "00:00 / " + (dmm < 10 ? "0" : "") + toIntString(dmm) + ":" + (dss < 10 ? "0" : "") + toIntString(dss)
            .byte 0
 t_k1:      .byte 5                     // touches (pkeys) : 40 colonnes en tout
            .text "SPACE"
